@@ -1,0 +1,10 @@
+		PLANO DE METAS OQUERRR
+	- Trabalhar com arquivos binários
+	- Usar arquivos .h's e .c's
+	- Remover grupos
+
+		Checklist (Problemas Encontrados)
+	- Npessoa está como Null
+	- Não lista as pessoas do grupo alfabeticamente
+	- Não incluir no grupo quem está inválido
+	- Problema em que não sai do loop qnd aperta 0 no linux
