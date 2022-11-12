@@ -51,12 +51,16 @@ int main(int argc, char ** argv)
         Salva_pessoas(p, n_pessoas);
         Salva_grupos(g, n_grupos);
         free(p);
-        free(g);
-        free(c);
-        for(i = 0; i < n_conversas; i++){
-            free(m[i]);
+
+        for (i = 0; i < n_grupos) {
+            free(g[i].npessoa);
         }
-        free(m);
+        free(g);
+
+        for (i = 0; i < n_conversas; i++) {
+            free(c[i].texto);
+        }
+        free(c);
 
         printf("Backup feito com sucesso\n");
         printf("Saindo...\n");

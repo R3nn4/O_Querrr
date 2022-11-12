@@ -11,83 +11,108 @@
 //e cada posição do segundo nível representa a conversa à qual pertencem as mensagens.
 //Pra isso serve o ID das conversas: sincronizar cada conversa com seu respectivo pointer de mensagens.
 
+Conversa* cria_conversa_privada(Conversa* conversa_pntr, Pessoa* pessoa, int* num_conversaAtual, int num_p) {
+	int i, id_1, id_2;
+	(*num_conversaAtual)++;
+	printf("\n----Insira os IDs das duas pessoas que farao parte da conversa----\n");
+	printf("Id 1\n> ");
+	scanf("%d", &id_1);
+	printf("Id 2\n> ");
+	scanf("%d", &id_2);
 
-void cria_conversa_privada(Conversa* conversa_pntr, Pessoa * pessoa, int *num_conversaAtual, int num_p) {
-	int i;
-
-		conversa_pntr[(*num_conversaAtual)-1].ID_conversa = *num_conversaAtual; //identifica o ID da conversa, ou seja, a posição
-																		//da conversa no vetor de conversas 
-		printf("\n----Insira os IDs das duas pessoas que farao parte da conversa----\n");
-			printf("Id 1\n> ");
-			scanf("%d", &(conversa_pntr[(*num_conversaAtual)-1].ID_pessoa1));
-			printf("Id 2\n> ");
-			scanf("%d", &(conversa_pntr[(*num_conversaAtual)-1].ID_pessoa2));
-
-		conversa_pntr[(*num_conversaAtual)-1].numMensagens = 0;
-		//Caso seja um id Falso ou um além do numero de pessoas ele não deixa abrir a mensagem
-		if(conversa_pntr[(*num_conversaAtual)-1].ID_pessoa1 > num_p || pessoa[conversa_pntr[(*num_conversaAtual)-1].ID_pessoa1 - 1].valido_p == FALSE){
-			printf("O primeiro ID eh desconhecido\n\n");
-			conversa_pntr = (Conversa *) realloc(conversa_pntr, ((*num_conversaAtual)-1) * sizeof(Conversa));
-			if(conversa_pntr == NULL){
-				conversa_pntr = (Conversa *) malloc(1 * sizeof(Conversa));
-			}
-			(*num_conversaAtual)--;
-		} else if(conversa_pntr[(*num_conversaAtual)-1].ID_pessoa2 > num_p || pessoa[conversa_pntr[(*num_conversaAtual)-1].ID_pessoa2 - 1].valido_p == FALSE){
-			printf("O segundo ID eh desconhecido\n\n");
-			conversa_pntr = (Conversa *) realloc(conversa_pntr, ((*num_conversaAtual)-1) * sizeof(Conversa));
-			if(conversa_pntr == NULL){
-				conversa_pntr = (Conversa *) malloc(1 * sizeof(Conversa));
-			}
-			(*num_conversaAtual)--;
-		}	else{
-			for(i=0; i < *num_conversaAtual - 1; i++){
-				if(conversa_pntr[i].ID_pessoa1 == conversa_pntr[(*num_conversaAtual)-1].ID_pessoa1 || conversa_pntr[i].ID_pessoa1 == conversa_pntr[(*num_conversaAtual)-1].ID_pessoa2 ){
-					if(conversa_pntr[i].ID_pessoa2 == conversa_pntr[(*num_conversaAtual)-1].ID_pessoa2 || conversa_pntr[i].ID_pessoa2 == conversa_pntr[(*num_conversaAtual)-1].ID_pessoa1){
-						printf("Conversa ja existente\n\n");
-						conversa_pntr = (Conversa *) realloc(conversa_pntr, ((*num_conversaAtual)-1) * sizeof(Conversa));
-						if(conversa_pntr == NULL){
-							conversa_pntr = (Conversa *) malloc(1 * sizeof(Conversa));
-						}
-						(*num_conversaAtual)--;
-					}
+	//Caso seja um id Falso ou um além do numero de pessoas ele não deixa abrir a mensagem
+	if (id_1 > num_p || pessoa[id_1 - 1].valido_p == FALSE) {
+		printf("O primeiro ID eh desconhecido\n\n");
+		(*num_conversaAtual)--;
+		return conversa_pntr;
+	}
+	else if (id_2 > num_p || pessoa[id_2 - 1].valido_p == FALSE) {
+		printf("O segundo ID eh desconhecido\n\n");
+		(*num_conversaAtual)--;
+		return conversa_pntr;
+	}
+	else {   // se nenhum dos IDs extrapola a qntd de pessoa ou ja tenha sido removido, ele confere se a conversa ja existe. Conversa 1 e 2/ 2 e 1 sao iguais
+		for (i = 0; i < *num_conversaAtual - 1; i++) {
+			if (conversa_pntr[i].ID_pessoa1 == id_1 || conversa_pntr[i].ID_pessoa1 == id_2) {
+				if (conversa_pntr[i].ID_pessoa2 == id_2 || conversa_pntr[i].ID_pessoa2 == id_1) {
+					printf("Conversa ja existente\n\n");
+					(*num_conversaAtual)--;
+					return conversa_pntr;
 				}
 			}
 		}
-
-		conversa_pntr[(*num_conversaAtual) - 1].texto = NULL;
+	}
+	conversa_pntr = (Conversa*)realloc(conversa_pntr, (*num_conversaAtual) * sizeof(Conversa));
+	conversa_pntr[(*num_conversaAtual) - 1].ID_conversa = *num_conversaAtual; //identifica o ID da conversa, ou seja, a posição
+	//da conversa no vetor de conversas
+	conversa_pntr[(*num_conversaAtual - 1)].ID_pessoa1 = id_1;
+	conversa_pntr[(*num_conversaAtual - 1)].ID_pessoa2 = id_2;
+	conversa_pntr[(*num_conversaAtual) - 1].numMensagens = 0;
+	return conversa_pntr;
 }
 
-void cria_conversa_grupo(Conversa* conversa_pntr, Grupo * grupo, int *num_conversaAtual, int num_g) {
-	int i;
-		conversa_pntr[(*num_conversaAtual)-1].ID_conversa = *num_conversaAtual; //identifica o ID da conversa, ou seja, a posição
-																		//da conversa no vetor de conversas 
-		printf("\n----Insira o ID do grupo----\n> ");
-		scanf("%d", &(conversa_pntr[(*num_conversaAtual)-1].ID_pessoa1));
-		conversa_pntr[(*num_conversaAtual)-1].ID_pessoa2 = -1;
-
-		conversa_pntr[(*num_conversaAtual)-1].numMensagens = 0;
-		//Caso seja um id Falso ou um além do numero de pessoas ele não deixa abrir a mensagem
-		if(conversa_pntr[(*num_conversaAtual)-1].ID_pessoa1 > num_g || grupo[conversa_pntr[(*num_conversaAtual)-1].ID_pessoa1 - 1].valido_g == FALSE){
-			printf("Grupo nao encontrado\n\n");
-			conversa_pntr = (Conversa *) realloc(conversa_pntr, ((*num_conversaAtual)-1) * sizeof(Conversa));
-			if(conversa_pntr == NULL){
-				conversa_pntr = (Conversa *) malloc(1 * sizeof(Conversa));
-			}
-			(*num_conversaAtual)--;
-		} else{
-			for(i=0; i < *num_conversaAtual - 1; i++){
-				if(conversa_pntr[i].ID_pessoa1 == conversa_pntr[(*num_conversaAtual)-1].ID_pessoa1){
-					if(conversa_pntr[i].ID_pessoa2 == -1){
-						printf("Conversa ja existente\n\n");
-						conversa_pntr = (Conversa *) realloc(conversa_pntr, ((*num_conversaAtual)-1) * sizeof(Conversa));
-						if(conversa_pntr == NULL){
-						conversa_pntr = (Conversa *) malloc(1 * sizeof(Conversa));
-						}
-						(*num_conversaAtual)--;
-					}
+Conversa* cria_conversa_grupo(Conversa* conversa_pntr, Grupo* grupo, int* num_conversaAtual, int num_g) {
+	int i, id_1, id_2;
+	(*num_conversaAtual)++;
+	printf("\n----Insira o ID do grupo----\n> ");
+	scanf("%d", &id_1);
+	id_2 = -1;
+	//Caso seja um id Falso ou um além do numero de pessoas ele não deixa abrir a mensagem
+	if (id_1 > num_g || grupo[id_1 - 1].valido_g == FALSE) {
+		printf("Grupo nao encontrado\n\n");
+		(*num_conversaAtual)--;
+		return conversa_pntr;
+	}
+	else {     //se nenhum dos IDs extrapola a qntd de pessoa ou ja tenha sido removido, ele confere se a conversa ja existe.
+		for (i = 0; i < *num_conversaAtual - 1; i++) {
+			if (conversa_pntr[i].ID_pessoa1 == id_1) {
+				if (id_2 == -1) {
+					printf("Essa conversa de grupo ja existe\n\n");
+					conversa_pntr = (Conversa*)realloc(conversa_pntr, ((*num_conversaAtual) - 1) * sizeof(Conversa));
+					(*num_conversaAtual)--;
+					return conversa_pntr;
 				}
 			}
 		}
+	}
+	conversa_pntr = (Conversa*)realloc(conversa_pntr, (*num_conversaAtual) * sizeof(Conversa));
+	conversa_pntr[(*num_conversaAtual) - 1].ID_conversa = *num_conversaAtual; //identifica o ID da conversa, ou seja, a posição
+	//da conversa no vetor de conversas
+	conversa_pntr[(*num_conversaAtual) - 1].ID_pessoa1 = id_1;
+	conversa_pntr[(*num_conversaAtual) - 1].ID_pessoa2 = id_2;  // identifica q se trata de um grupo. OBS: não há ID -1
+	conversa_pntr[(*num_conversaAtual) - 1].numMensagens = 0;
+	return conversa_pntr;
+}
+
+void lista_conversas(Pessoa* pessoa, Grupo* grupo, Conversa* conversa, int num_conversas, int var_controle) {
+	int i;
+	printf("\n\t    Oquerrr\n");
+	imprime_traco();
+	printf("|ID\t|Conversa\n");
+	imprime_traco();
+	if (var_controle < 0) {   //Conversas de grupos
+		for (i = 0; i < num_conversas; i++) {
+			if (conversa[i].ID_pessoa2 > 0) {
+				continue;
+			}
+			else {
+				printf("|%d\t|%s\n", conversa[i].ID_conversa, grupo[conversa[i].ID_pessoa1 - 1].nome_g);
+			}
+		}
+		imprime_traco();
+	}
+	else { //Conversa de pessoas
+		for (i = 0; i < num_conversas; i++) {
+			if (conversa[i].ID_pessoa2 < 0) {
+				continue;
+			}
+			else {
+				printf("|%d\t|%s - %s\n", conversa[i].ID_conversa, pessoa[conversa[i].ID_pessoa1 - 1].nome_p, pessoa[conversa[i].ID_pessoa2 - 1].nome_p);
+			}
+		}
+		imprime_traco();
+	}
+
 }
 
 void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Grupo* grupos, int num_Mensagens, int ID_conversa) {
@@ -100,7 +125,7 @@ void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Gr
 		scanf("%d", &ID_remetente);
 
 		if(conversas[num_Mensagens].ID_pessoa2 == -1){
-			for(i = 0; i < grupos; i++){
+			for(i = 0; i < grupos->num_pessoas; i++){
 				if(ID_remetente == grupos[conversas[ID_conversa].ID_conversa].npessoa[i]){
 					confereID = TRUE;
 				}
@@ -154,7 +179,7 @@ void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Gr
 
 void apaga_mensagem(Mensagens* mensagens_conversa_atual, int num_Mensagens) {
 	int ID_mensagem = 0, i = 0;
-	bool_t encontrado = FALSE;
+	bool_t encontrado;
 
 	printf("\n\nInsira o ID da mensagem que deseja apagar: ");
 	scanf("%d", &ID_mensagem);
@@ -271,9 +296,9 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 
 		grupo_atual = &conversas[ID_grupo]; //coloca o grupo selecionado dentro de uma variavel, pra simplificar
 
-		for (i = 0; i < *grupo_atual->numMensagens; i++) { //imprime as mensagens do grupo;
-			if (*grupo_atual->texto[i].valido_c == TRUE) {
-				printf("[%d]-[%s] [%s]\n", grupo_atual->texto[i].id_c, pessoas[grupo_atual->texto[i].ID_remetente].nome_p, grupo_atual->texto[i].mensagem *);
+		for (i = 0; i < grupo_atual->numMensagens; i++) { //imprime as mensagens do grupo;
+			if (grupo_atual->texto[i].valido_c == TRUE) {
+				printf("[%d]-[%s] [%s]\n", grupo_atual->texto[i].id_c, pessoas[grupo_atual->texto[i].ID_remetente].nome_p, grupo_atual->texto[i].mensagem);
 			}
 		}
 
@@ -304,27 +329,28 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 	}
 }
 
-void qual_conversa(Pessoa * pessoas, Grupo *grupo, Conversa * conversa, int *num_conversas, int num_p, int num_g){
+Conversa* qual_conversa(Pessoa* pessoas, Grupo* grupo, Conversa* conversa, int* num_conversas, int num_p, int num_g) {
 	int opcao;
-		printf("\n\t\tOquerrr\n\t\t(Conversas)\n");
-		imprime_traco();
-		printf("\t1 - Conversa Privada\n\n\t2 - Conversa de Grupo\n\n\t3 - Voltar sessao anterior\n> ");
-		scanf("%d%*c", &opcao);
-			switch (opcao){
-				case 3:
-					break;
-				case 1:
-					cria_conversa_privada(conversa, pessoas, num_conversas, num_p);
-					break;
-				case 2:
-					cria_conversa_grupo(conversa, grupo, num_conversas, num_g);
-				break;
-				default:
-					break;
-			}
+	printf("\n\t\tOquerrr\n\t\t(Conversas)\n");
+	imprime_traco();
+	printf("\t1 - Conversa Privada\n\n\t2 - Conversa de Grupo\n\n\t3 - Voltar sessao anterior\n> ");
+	scanf("%d%*c", &opcao);
+	switch (opcao) {
+	case 3:
+		break;
+	case 1:
+		conversa = cria_conversa_privada(conversa, pessoas, num_conversas, num_p);
+		break;
+	case 2:
+		conversa = cria_conversa_grupo(conversa, grupo, num_conversas, num_g);
+		break;
+	default:
+		break;
+	}
+	return conversa;
 }
 
-Conversa * mod_conversas(Pessoa * pessoas, Grupo *grupo, Conversa * conversa, int *num_conversas, int num_p, int num_g) {
+Conversa * mod_conversas(Pessoa * pessoas, Grupo * grupo, Conversa * conversa, int *num_conversas, int num_p, int num_g) {
 	int opcao = 0;
 
 		do {
@@ -336,14 +362,14 @@ Conversa * mod_conversas(Pessoa * pessoas, Grupo *grupo, Conversa * conversa, in
 			case 4:
 				break;
 			case 1: 
-				(*num_conversas)++;
-				conversa = (Conversa*) realloc(conversa, (*num_conversas) * sizeof(Conversa));
-				qual_conversa(pessoas,grupo,conversa,num_conversas, num_p, num_g);
+				conversa = qual_conversa(pessoas, grupo, conversa, num_conversas, num_p, num_g);
 				break;
 			case 2:
+				lista_conversas(pessoas, grupo, conversa, *num_conversas, 1);
 				abre_conversa(conversa, pessoas, grupo, *num_conversas);
 				break;
 			case 3:
+				lista_conversas(pessoas, grupo, conversa, *num_conversas, -1);
 				abre_grupo(grupo, conversa, pessoas, num_g, *num_conversas);
 				break;
 			}
