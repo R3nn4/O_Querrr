@@ -90,27 +90,56 @@ void cria_conversa_grupo(Conversa* conversa_pntr, Grupo * grupo, int *num_conver
 		}
 }
 
-void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, int num_Mensagens) {
+void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Grupo* grupos, int num_Mensagens, int ID_conversa) {
 	//modificar 
-	int ID_remetente = 0;
+	int ID_remetente = 0, i = 0;
 	bool_t confereID = FALSE;
 	
 	do {
 		printf("\n\n0 - Retornar \n- ID do remetente: ");
 		scanf("%d", &ID_remetente);
 
-		if (ID_remetente == conversas[num_Mensagens].ID_pessoa1 || ID_remetente == conversas[num_Mensagens].ID_pessoa2) {
-			confereID = TRUE;
-		}
-		else if(ID_remetente == 0) {
-			break;
+		if(conversas[num_Mensagens].ID_pessoa2 == -1){
+			for(i = 0; i < grupos; i++){
+				if(ID_remetente == grupos[conversas[ID_conversa].ID_conversa].npessoa[i]){
+					confereID = TRUE;
+				}
+				else if(ID_remetente == 0){
+					break;
+				}
+			}
+			if(ID_remetente == 0){
+				break;
+			}
+
+			if(confereID == FALSE){
+				printf("\n\nID nao encontrado nesse grupo\n\n");
+			}
 		}
 		else {
-			confereID = FALSE;
-			printf("ID nao encontrado nessa conversa\n");
+
+			if (ID_remetente == conversas[num_Mensagens].ID_pessoa1 || ID_remetente == conversas[num_Mensagens].ID_pessoa2) {
+				confereID = TRUE;
+			}
+			else if(ID_remetente == 0) {
+				break;
+			}
+			else {
+				confereID = FALSE;
+				printf("\nID nao encontrado nessa conversa\n");
+			}
+
 		}
-		
+
+		if(ID_remetente == 0){
+			break;
+		}
+
 	} while (confereID != TRUE || confereID == 0);
+
+	if(ID_remetente == 0){
+		break;
+	}
 
 	mensagens_conversa_atual = (Mensagens*)realloc(mensagens_conversa_atual, num_Mensagens * sizeof(Mensagens));
 	mensagens_conversa_atual[num_Mensagens].ID_remetente = ID_remetente;
@@ -126,6 +155,7 @@ void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, in
 
 void apaga_mensagem(Mensagens* mensagens_conversa_atual, int num_Mensagens) {
 	int ID_mensagem = 0, i = 0;
+	bool_t encontrado = FALSE;
 
 	printf("\n\nInsira o ID da mensagem que deseja apagar: ");
 	scanf("%d", &ID_mensagem);
@@ -133,14 +163,20 @@ void apaga_mensagem(Mensagens* mensagens_conversa_atual, int num_Mensagens) {
 	for (i = 0; i < num_Mensagens; i++) {  //Busca a mensagem no vetor de mensagens da conversa e a marca como invalida
 		if (ID_mensagem == mensagens_conversa_atual[i].id_c && mensagens_conversa_atual[i].apagavel_c == TRUE) {
 			mensagens_conversa_atual[i].valido_c = FALSE;
+			encontrado = TRUE;
+			printf("\nMensagem apagada com sucesso!\n");
 		}
 		else {
-			printf("\nMensagem nao encontrada.\n");
+			encontrado == FALSE;
 		}
+	}
+
+	if (encontrado == FALSE) {
+		printf("\nEssa mensagem nao existe ou ja nao pode ser apagada\n");
 	}
 }
 
-void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, int num_conversas) {
+void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int num_conversas) {
 	int i = 0, opcao = 0, ID_conversa = 0;
 	bool_t confereID_Conversa;
 
@@ -182,8 +218,7 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, int num_conversas) 
 		switch (opcao) {
 		case 1:
 			conversa_pntr[ID_conversa].numMensagens++;
-			conversa_pntr[ID_conversa].texto = mensagens[ID_conversa];
-			envia_mensagem(conversa_pntr[ID_conversa].texto, conversa_pntr, conversa_pntr[ID_conversa].numMensagens);
+			envia_mensagem(conversa_pntr[ID_conversa].texto, conversa_pntr, grupos, conversa_pntr[ID_conversa].numMensagens, ID_conversa);
 			break;
 		case 2:
 			apaga_mensagem(conversa_pntr[ID_conversa].texto, conversa_pntr[ID_conversa].numMensagens);
@@ -201,7 +236,7 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, int num_conversas) 
 		break;
 	}
 }
-
+//adicionar o bagulho pra não poder apagar mensagem;
 void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_grupos) {
 	int ID_grupo = 0, i = 0, opcao = 0;
 	bool_t confereID_grupo;
@@ -234,7 +269,7 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 	do{
 		grupo_atual = &conversas[ID_grupo]; //coloca o grupo selecionado dentro de uma variavel, pra simplificar
 
-		for (i = 0; i < *grupo_atual->numMensagens; i++) {
+		for (i = 0; i < *grupo_atual->numMensagens; i++) { //imprime as mensagens do grupo;
 			if (*grupo_atual->texto[i].valido_c == TRUE) {
 				printf("[%d]-[%s] [%s]\n", grupo_atual->texto[i].id_c, pessoas[grupo_atual->texto[i].ID_remetente].nome_p, grupo_atual->texto[i].mensagem *);
 			}
@@ -247,10 +282,10 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 		case 0:
 			break;
 		case 1:
-			//Modificar envia_mensagem;
+			envia_mensagem(grupo_atual->texto, conversas, grupos, grupo_atual->numMensagens, ID_grupo);
 			break;
 		case 2:
-			//Modificar apaga_mensagem;
+			apaga_mensagem(grupo_atual->texto, grupo_atual->numMensagens);
 			break;
 		default:
 			printf("Opcao nao encontrada!");
@@ -301,7 +336,7 @@ Conversa * mod_conversas(Pessoa * pessoas, Grupo *grupo, Conversa * conversa, in
 				qual_conversa(pessoas,grupo,conversa,num_conversas, num_p, num_g);
 				break;
 			case 2:
-				abre_conversa(conversa, *num_conversas);
+				abre_conversa(conversa, pessoas, grupo, *num_conversas);
 				break;
 			case 3:
 				abre_grupo(grupo, num_g);
