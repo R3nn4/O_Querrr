@@ -124,9 +124,9 @@ void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Gr
 		printf("\n\n0 - Retornar \n- ID do remetente: ");
 		scanf("%d", &ID_remetente);
 
-		if(conversas[num_Mensagens].ID_pessoa2 == -1){
-			for(i = 0; i < grupos->num_pessoas; i++){
-				if(ID_remetente == grupos[conversas[ID_conversa].ID_conversa].npessoa[i]){
+		if(conversas[ID_conversa] - 1].ID_pessoa2 == -1) {
+			for(i = 0; i < grupos[ID_conversa].num_pessoas; i++){
+				if(ID_remetente == grupos[conversas[ID_conversa].ID_conversa - 1].npessoa[i]){
 					confereID = TRUE;
 				}
 				else if(ID_remetente == 0){
@@ -143,7 +143,7 @@ void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Gr
 		}
 		else {
 
-			if (ID_remetente == conversas[num_Mensagens].ID_pessoa1 || ID_remetente == conversas[num_Mensagens].ID_pessoa2) {
+			if (ID_remetente == conversas[ID_conversa].ID_pessoa1 || ID_remetente == conversas[ID_conversa].ID_pessoa2) {
 				confereID = TRUE;
 			}
 			else if(ID_remetente == 0) {
@@ -274,10 +274,10 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 		scanf("%d", &ID_grupo);
 
 		for (i = 0; i < num_grupos; i++) {
-			if (ID_grupo == grupos[i].id_g) {
-				confereID_grupo == TRUE;
+			if (ID_grupo == (grupos[i].id_g)) {
+				confereID_grupo = TRUE;
 			}
-			else if (confereID_grupo == 0) {
+			else if (ID_grupo == 0) {
 				break;
 			}
 			else {
