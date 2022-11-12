@@ -124,9 +124,9 @@ void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Gr
 		printf("\n\n0 - Retornar \n- ID do remetente: ");
 		scanf("%d", &ID_remetente);
 
-		if(conversas[ID_conversa] - 1].ID_pessoa2 == -1) {
+		if(conversas[ID_conversa].ID_pessoa2 == -1) {
 			for(i = 0; i < grupos[ID_conversa].num_pessoas; i++){
-				if(ID_remetente == grupos[conversas[ID_conversa].ID_conversa - 1].npessoa[i]){
+				if(ID_remetente == grupos[conversas[ID_conversa].ID_conversa].npessoa[i]){
 					confereID = TRUE;
 				}
 				else if(ID_remetente == 0){
