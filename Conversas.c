@@ -177,7 +177,7 @@ void apaga_mensagem(Mensagens* mensagens_conversa_atual, int num_Mensagens) {
 }
 
 void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int num_conversas) {
-	int i = 0, opcao = 0, ID_conversa = 0;
+	int i = 0, j = 0, opcao = 0, ID_conversa = 0;
 	bool_t confereID_Conversa;
 
 	do {
@@ -196,7 +196,7 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int 
 				confereID_Conversa = FALSE;
 			}
 		}
-		if (ID_conversa == 0) { //sai do do-while se ID_convers == 0;
+		if (ID_conversa == 0) { //sai do do-while se ID_conversa == 0;
 			break;
 		}
 	} while (confereID_Conversa != TRUE || confereID_Conversa == 0);
@@ -232,13 +232,19 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int 
 
 	} while (opcao != 0);
 
+	for (i = 0; i < num_conversas; i++) {
+		for (j = 0; j < conversa_pntr[i].numMensagens; j++) {
+			conversa_pntr[i].texto[j].apagavel_c = FALSE;
+		}
+	}
+
 	if (opcao == 3) {
 		break;
 	}
 }
-//adicionar o bagulho pra não poder apagar mensagem;
-void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_grupos) {
-	int ID_grupo = 0, i = 0, opcao = 0;
+
+void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_grupos, int num_conversas) {
+	int ID_grupo = 0, i = 0, opcao = 0, j = 0;
 	bool_t confereID_grupo;
 	Conversa* grupo_atual;
 
@@ -294,6 +300,13 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 
 	} while (opcao != 0);
 
+	//Define todas as mensagens até então escritas como não-apagáveis
+	for (i = 0; i < num_conversas; i++) {
+		for (j = 0; j < conversas[i].numMensagens; j++) {
+			conversas[i].texto[j].apagavel_c = FALSE;
+		}
+	}
+
 	if (opcao == 0) {
 		break;
 	}
@@ -339,7 +352,7 @@ Conversa * mod_conversas(Pessoa * pessoas, Grupo *grupo, Conversa * conversa, in
 				abre_conversa(conversa, pessoas, grupo, *num_conversas);
 				break;
 			case 3:
-				abre_grupo(grupo, num_g);
+				abre_grupo(grupo, conversa, pessoas, num_g, *num_conversas);
 				break;
 			}
 		} while (opcao != 4);

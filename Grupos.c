@@ -250,7 +250,7 @@ Grupo *mod_grupo(Grupo *g, Pessoa *p, int *num_g, int num_p){   //funções de m
             case 1:                     //Cadastrar
                 (*num_g)++; //adiciona sempre o num de pessoas que tiver
                 g = (Grupo *) realloc(g, *num_g * sizeof(Grupo));
-                cadastro_grupo(&(g[(*num_g) - 1]), p, *num_g, num_p);
+                cadastro_grupo(&(g[(*num_g) - 1]), p, *num_g, *num_p);
                 break;
             case 2:                      //Listar
                 ordem_grupo(g, p,(*num_g), num_p); //Listagem
