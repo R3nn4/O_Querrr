@@ -175,8 +175,9 @@ Mensagens * envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conver
 
 		if(conversas[ID_conversa].ID_pessoa2 == -1) {
 			for(i = 0; i < grupos[ID_conversa].num_pessoas; i++){
-				if(ID_remetente == grupos[conversas[ID_conversa].ID_conversa].npessoa[i]){
+				if(ID_remetente == grupos[conversas[ID_conversa].ID_conversa].npessoa[i] && pessoas[ID_remetente].valido_p == TRUE){
 					confereID = TRUE;
+					break;
 				}
 				else if(ID_remetente == 0){
 					break;
