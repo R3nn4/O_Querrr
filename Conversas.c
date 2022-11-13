@@ -7,6 +7,58 @@
 #include "Tipos.h"
 #include "funcs_uteis.h"
 
+void Salva_conversas(Conversa *c, int num_conversas){
+    int i, j;
+    FILE *arq_conversas = fopen("Conversas.bin", "wb");
+        if(arq_conversas != NULL){
+        fwrite(&num_conversas, sizeof(int), 1, arq_conversas);
+        for (i = 0; i < num_conversas; i++){
+            fwrite(&(c[i].ID_conversa), sizeof(int), 1, arq_conversas);
+            fwrite(&(c[i].ID_pessoa1), sizeof(int), 1, arq_conversas);
+            fwrite(&(c[i].ID_pessoa2), sizeof(int), 1, arq_conversas);
+            fwrite(&(c[i].numMensagens), sizeof(int), 1, arq_conversas);
+                for (j = 0; j < c[i].numMensagens; j++){
+                    fwrite(&(c[i].texto[j].id_c), sizeof(int), 1, arq_conversas);
+                    fwrite(&(c[i].texto[j].ID_remetente), sizeof(int), 1, arq_conversas);
+                    fwrite(&(c[i].texto[j].mensagem), LIM_MAX_MSG * sizeof(char), 1, arq_conversas);
+                    fwrite(&(c[i].texto[j].valido_c), sizeof(int), 1, arq_conversas);
+                    fwrite(&(c[i].texto[j].apagavel_c), sizeof(int), 1, arq_conversas);
+                }
+        }
+    fclose(arq_conversas);
+        } else{
+            perror("Escrita em arq_conversas ");
+        }
+}
+
+Conversa * Traz_conversas(int *num_conversas){
+    int i, j;
+    FILE *arq_conversas = fopen("Conversas.bin", "rb");
+    Conversa *c;
+        if(arq_conversas != NULL){
+        fread(num_conversas, sizeof(int), 1, arq_conversas);
+        c = (Conversa *) malloc((*num_conversas) * sizeof(Conversa));
+        for (i = 0; i < *num_conversas; i++){
+            fread(&(c[i].ID_conversa), sizeof(int), 1, arq_conversas);
+            fread(&(c[i].ID_pessoa1), sizeof(int), 1, arq_conversas);
+            fread(&(c[i].ID_pessoa2), sizeof(int), 1, arq_conversas);
+            fread(&(c[i].numMensagens), sizeof(int), 1, arq_conversas);
+            c[i].texto = (Mensagens *) malloc(c[i].numMensagens * sizeof(Mensagens));
+                for (j = 0; j < c[i].numMensagens; j++){
+                    fread(&(c[i].texto[j].id_c), sizeof(int), 1, arq_conversas);
+                    fread(&(c[i].texto[j].ID_remetente), sizeof(int), 1, arq_conversas);
+                    fread(&(c[i].texto[j].mensagem), LIM_MAX_MSG * sizeof(char), 1, arq_conversas);
+                    fread(&(c[i].texto[j].valido_c), sizeof(int), 1, arq_conversas);
+                    fread(&(c[i].texto[j].apagavel_c), sizeof(int), 1, arq_conversas);
+                }
+        }
+    fclose(arq_conversas);
+        } else{
+            perror("Escrita em arq_conversas ");
+        }
+    return c;
+}
+
 Conversa* cria_conversa_privada(Conversa* conversa_pntr, Pessoa* pessoa, int* num_conversaAtual, int num_p) {
 	int i, id_1, id_2;
 	(*num_conversaAtual)++;
@@ -43,6 +95,7 @@ Conversa* cria_conversa_privada(Conversa* conversa_pntr, Pessoa* pessoa, int* nu
 	conversa_pntr[(*num_conversaAtual - 1)].ID_pessoa1 = id_1;
 	conversa_pntr[(*num_conversaAtual - 1)].ID_pessoa2 = id_2;
 	conversa_pntr[(*num_conversaAtual) - 1].numMensagens = 0;
+	conversa_pntr[(*num_conversaAtual) - 1].texto = NULL;
 	return conversa_pntr;
 }
 
@@ -61,7 +114,7 @@ Conversa* cria_conversa_grupo(Conversa* conversa_pntr, Grupo* grupo, int* num_co
 	else {     //se nenhum dos IDs extrapola a qntd de pessoa ou ja tenha sido removido, ele confere se a conversa ja existe.
 		for (i = 0; i < *num_conversaAtual - 1; i++) {
 			if (conversa_pntr[i].ID_pessoa1 == id_1) {
-				if (id_2 == -1) {
+				if (conversa_pntr[i].ID_pessoa2 == -1) {
 					printf("Essa conversa de grupo ja existe\n\n");
 					conversa_pntr = (Conversa*)realloc(conversa_pntr, ((*num_conversaAtual) - 1) * sizeof(Conversa));
 					(*num_conversaAtual)--;
@@ -76,6 +129,7 @@ Conversa* cria_conversa_grupo(Conversa* conversa_pntr, Grupo* grupo, int* num_co
 	conversa_pntr[(*num_conversaAtual) - 1].ID_pessoa1 = id_1;
 	conversa_pntr[(*num_conversaAtual) - 1].ID_pessoa2 = id_2;  // identifica q se trata de um grupo. OBS: não há ID -1
 	conversa_pntr[(*num_conversaAtual) - 1].numMensagens = 0;
+	conversa_pntr[(*num_conversaAtual) - 1].texto = NULL;
 	return conversa_pntr;
 }
 
@@ -110,14 +164,14 @@ void lista_conversas(Pessoa* pessoa, Grupo* grupo, Conversa* conversa, int num_c
 
 }
 
-void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Grupo* grupos, int num_Mensagens, int ID_conversa) {
+Mensagens * envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Grupo* grupos, int num_Mensagens, int ID_conversa) {
 	//modificar 
 	int ID_remetente = 0, i = 0;
 	bool_t confereID = FALSE;
 	
 	do {
 		printf("\n\n0 - Retornar \n- ID do remetente: ");
-		scanf("%d", &ID_remetente);
+		scanf("%d%*c", &ID_remetente);
 
 		if(conversas[ID_conversa].ID_pessoa2 == -1) {
 			for(i = 0; i < grupos[ID_conversa].num_pessoas; i++){
@@ -140,6 +194,7 @@ void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Gr
 
 			if (ID_remetente == conversas[ID_conversa].ID_pessoa1 || ID_remetente == conversas[ID_conversa].ID_pessoa2) {
 				confereID = TRUE;
+				break;
 			}
 			else if(ID_remetente == 0) {
 				break;
@@ -160,16 +215,17 @@ void envia_mensagem(Mensagens* mensagens_conversa_atual, Conversa* conversas, Gr
 	if (ID_remetente != 0) {
 
 		mensagens_conversa_atual = (Mensagens*)realloc(mensagens_conversa_atual, num_Mensagens * sizeof(Mensagens));
-		mensagens_conversa_atual[num_Mensagens].ID_remetente = ID_remetente;
-		mensagens_conversa_atual[num_Mensagens].id_c = num_Mensagens;
+		mensagens_conversa_atual[num_Mensagens-1].ID_remetente = ID_remetente;
+		mensagens_conversa_atual[num_Mensagens-1].id_c = num_Mensagens;
 
 		printf("\nSua mensagem: ");
-		fgets(mensagens_conversa_atual[num_Mensagens].mensagem, LIM_MAX_MSG, stdin);
-		remove_enter(mensagens_conversa_atual[num_Mensagens].mensagem);
+		fgets(mensagens_conversa_atual[num_Mensagens-1].mensagem, LIM_MAX_MSG, stdin);
+		remove_enter(mensagens_conversa_atual[num_Mensagens-1].mensagem);
 
-		mensagens_conversa_atual[num_Mensagens].valido_c = TRUE;
-		mensagens_conversa_atual[num_Mensagens].apagavel_c = TRUE;
+		mensagens_conversa_atual[num_Mensagens-1].valido_c = TRUE;
+		mensagens_conversa_atual[num_Mensagens-1].apagavel_c = TRUE;
 	}
+	return mensagens_conversa_atual;
 }
 
 void apaga_mensagem(Mensagens* mensagens_conversa_atual, int num_Mensagens) {
@@ -186,7 +242,7 @@ void apaga_mensagem(Mensagens* mensagens_conversa_atual, int num_Mensagens) {
 			printf("\nMensagem apagada com sucesso!\n");
 		}
 		else {
-			encontrado == FALSE;
+			encontrado = FALSE;
 		}
 	}
 
@@ -200,12 +256,13 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int 
 	bool_t confereID_Conversa;
 
 	do {
-		printf("\n0 - Voltar a seçao anterior \nInsira o ID da conversa que deseja abrir: ");
+		printf("\n0 - Voltar a secao anterior \nInsira o ID da conversa que deseja abrir: ");
 		scanf("%d", &ID_conversa);
 
-		for (i = 0; i <= num_conversas; i++) {  //Confere se o ID inserido pela pessoa é valido;
+		for (i = 0; i < num_conversas; i++) {  //Confere se o ID inserido pela pessoa é valido;
 			if (ID_conversa == conversa_pntr[i].ID_conversa) {
 				confereID_Conversa = TRUE;
+				break;
 			}
 			else if (ID_conversa == 0) {
 				break;
@@ -237,7 +294,7 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int 
 		switch (opcao) {
 		case 1:
 			conversa_pntr[ID_conversa - 1].numMensagens++;
-			envia_mensagem(conversa_pntr[ID_conversa - 1].texto, conversa_pntr, grupos, conversa_pntr[ID_conversa - 1].numMensagens, (ID_conversa - 1));
+			conversa_pntr[ID_conversa - 1].texto = envia_mensagem(conversa_pntr[ID_conversa - 1].texto, conversa_pntr, grupos, conversa_pntr[ID_conversa - 1].numMensagens, (ID_conversa - 1));
 			break;
 		case 2:
 			apaga_mensagem(conversa_pntr[ID_conversa - 1].texto, conversa_pntr[ID_conversa - 1].numMensagens);
@@ -249,7 +306,7 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int 
 			break;
 		}
 
-	} while (opcao != 0);
+	} while (opcao != 3);
 
 	//Define todas as mensagens até então escritas como não-apagáveis
 	for (i = 0; i < num_conversas; i++) {
@@ -265,24 +322,22 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 	Conversa* grupo_atual;
 
 	do {
-		printf("\n\t0 - Voltar a seçao anterior \nInsira o ID do grupo que deseja abrir: ");
+		printf("\n\t0 - Voltar a secao anterior \nInsira o ID do grupo que deseja abrir: ");
 		scanf("%d", &ID_grupo);
 
-		for (i = 0; i < num_grupos; i++) {
-			if (ID_grupo == (grupos[i].id_g)) {
+		for (i = 0; i < num_conversas; i++) {
+			if (ID_grupo == (conversas[i].ID_conversa)) {
 				confereID_grupo = TRUE;
-			}
-			else if (ID_grupo == 0) {
 				break;
 			}
-			else {
-				printf("\nGrupo nao encontrado!\n");
+			else if (ID_grupo == 0) {
+				return;
 			}
 		}
 		if (confereID_grupo == 0) {
 			break;
 		}
-	} while (confereID_grupo != TRUE || confereID_grupo != 0);
+	} while (confereID_grupo != TRUE);
 
 	do{
 		if (confereID_grupo == 0) {
@@ -293,11 +348,11 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 
 		for (i = 0; i < grupo_atual->numMensagens; i++) { //imprime as mensagens do grupo;
 			if (grupo_atual->texto[i].valido_c == TRUE) {
-				printf("[%d]-[%s] [%s]\n", grupo_atual->texto[i].id_c, pessoas[grupo_atual->texto[i].ID_remetente].nome_p, grupo_atual->texto[i].mensagem);
+				printf("[%d]-[%s] [%s]\n", grupo_atual->texto[i].id_c, pessoas[grupo_atual->texto[i].ID_remetente-1].nome_p, grupo_atual->texto[i].mensagem);
 			}
 		}
 
-		printf("\n0 - Voltar a seçao anterior \n1 - Enviar mensagem \n2 - Apagar mensagem\n");
+		printf("\n0 - Voltar a secao anterior \n1 - Enviar mensagem \n2 - Apagar mensagem\n");
 		scanf("%d", &opcao);
 
 		switch (opcao){

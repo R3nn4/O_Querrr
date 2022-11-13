@@ -19,10 +19,10 @@ int main(int argc, char ** argv)
 
         if(pessoas == NULL || grupos == NULL || conversas == NULL){
             cria_arquivos(pessoas, grupos, conversas);
-        }else{
+        }
            p = Traz_pessoas(&n_pessoas);
            g = Traz_grupos(&n_grupos);
-        }
+           c = Traz_conversas(&n_conversas);
         fclose(pessoas);
         fclose(grupos);
         fclose(conversas);
@@ -50,9 +50,10 @@ int main(int argc, char ** argv)
         }while(choice != 4);
         Salva_pessoas(p, n_pessoas);
         Salva_grupos(g, n_grupos);
+        Salva_conversas(c, n_conversas);
         free(p);
 
-        for (i = 0; i < n_grupos) {
+        for (i = 0; i < n_grupos; i++) {
             free(g[i].npessoa);
         }
         free(g);

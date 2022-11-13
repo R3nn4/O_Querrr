@@ -22,7 +22,10 @@ typedef struct CONVERSAS{
 	Mensagens *texto;
 }Conversa;
 
+Conversa * Traz_conversas(int *num_conversas);
 
-Conversa * mod_conversas(Pessoa * pessoas, Grupo *grupo, Conversa * conversa, Mensagens ** mensagens, int *num_conversas, int num_p, int num_g);
+void Salva_conversas(Conversa *c, int num_conversas);
+
+Conversa * mod_conversas(Pessoa * pessoas, Grupo *grupo, Conversa * conversa, int *num_conversas, int num_p, int num_g);
 
 #endif //__conversas_h__
