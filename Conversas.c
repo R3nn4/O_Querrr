@@ -230,9 +230,9 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int 
 			break;
 		}
 
-		for (i = 0; i <= conversa_pntr[ID_conversa].numMensagens; i++) {  //Imprime as mensagens passadas dessa conversa
-			if (conversa_pntr[ID_conversa].texto[i].valido_c == TRUE) {
-				printf("[%d]-[%s] %s\n", conversa_pntr[ID_conversa].texto[i].id_c, pessoas[conversa_pntr[ID_conversa].texto[i].ID_remetente].nome_p, conversa_pntr[ID_conversa].texto[i].mensagem);
+		for (i = 0; i <= conversa_pntr[ID_conversa - 1].numMensagens; i++) {  //Imprime as mensagens passadas dessa conversa
+			if (conversa_pntr[ID_conversa - 1].texto[i].valido_c == TRUE) {
+				printf("[%d]-[%s] %s\n", conversa_pntr[ID_conversa - 1].texto[i].id_c, pessoas[conversa_pntr[ID_conversa - 1].texto[i].ID_remetente].nome_p, conversa_pntr[ID_conversa - 1].texto[i].mensagem);
 			}
 		}
 
@@ -241,11 +241,11 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int 
 
 		switch (opcao) {
 		case 1:
-			conversa_pntr[ID_conversa].numMensagens++;
-			envia_mensagem(conversa_pntr[ID_conversa].texto, conversa_pntr, grupos, conversa_pntr[ID_conversa].numMensagens, ID_conversa);
+			conversa_pntr[ID_conversa - 1].numMensagens++;
+			envia_mensagem(conversa_pntr[ID_conversa - 1].texto, conversa_pntr, grupos, conversa_pntr[ID_conversa - 1].numMensagens, (ID_conversa - 1));
 			break;
 		case 2:
-			apaga_mensagem(conversa_pntr[ID_conversa].texto, conversa_pntr[ID_conversa].numMensagens);
+			apaga_mensagem(conversa_pntr[ID_conversa - 1].texto, conversa_pntr[ID_conversa - 1].numMensagens);
 			break;
 		case 3:
 			break;
@@ -294,7 +294,7 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 			break;
 		}
 
-		grupo_atual = &conversas[ID_grupo]; //coloca o grupo selecionado dentro de uma variavel, pra simplificar
+		grupo_atual = &conversas[ID_grupo - 1]; //coloca o grupo selecionado dentro de uma variavel, pra simplificar
 
 		for (i = 0; i < grupo_atual->numMensagens; i++) { //imprime as mensagens do grupo;
 			if (grupo_atual->texto[i].valido_c == TRUE) {
@@ -309,7 +309,7 @@ void abre_grupo(Grupo* grupos, Conversa* conversas, Pessoa* pessoas, int num_gru
 		case 0:
 			break;
 		case 1:
-			envia_mensagem(grupo_atual->texto, conversas, grupos, grupo_atual->numMensagens, ID_grupo);
+			envia_mensagem(grupo_atual->texto, conversas, grupos, grupo_atual->numMensagens, (ID_grupo - 1));
 			break;
 		case 2:
 			apaga_mensagem(grupo_atual->texto, grupo_atual->numMensagens);
