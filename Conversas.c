@@ -7,10 +7,6 @@
 #include "Tipos.h"
 #include "funcs_uteis.h"
 
-//As mensagens serão guardadas em um pointer pointer, em que cada posição do primeiro nivel representa uma mensagem
-//e cada posição do segundo nível representa a conversa à qual pertencem as mensagens.
-//Pra isso serve o ID das conversas: sincronizar cada conversa com seu respectivo pointer de mensagens.
-
 Conversa* cria_conversa_privada(Conversa* conversa_pntr, Pessoa* pessoa, int* num_conversaAtual, int num_p) {
 	int i, id_1, id_2;
 	(*num_conversaAtual)++;
@@ -43,8 +39,7 @@ Conversa* cria_conversa_privada(Conversa* conversa_pntr, Pessoa* pessoa, int* nu
 		}
 	}
 	conversa_pntr = (Conversa*)realloc(conversa_pntr, (*num_conversaAtual) * sizeof(Conversa));
-	conversa_pntr[(*num_conversaAtual) - 1].ID_conversa = *num_conversaAtual; //identifica o ID da conversa, ou seja, a posição
-	//da conversa no vetor de conversas
+	conversa_pntr[(*num_conversaAtual) - 1].ID_conversa = *num_conversaAtual;
 	conversa_pntr[(*num_conversaAtual - 1)].ID_pessoa1 = id_1;
 	conversa_pntr[(*num_conversaAtual - 1)].ID_pessoa2 = id_2;
 	conversa_pntr[(*num_conversaAtual) - 1].numMensagens = 0;
@@ -208,7 +203,7 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int 
 		printf("\n0 - Voltar a seçao anterior \nInsira o ID da conversa que deseja abrir: ");
 		scanf("%d", &ID_conversa);
 
-		for (i = 0; i < num_conversas; i++) {  //Confere se o ID inserido pela pessoa é valido;
+		for (i = 0; i <= num_conversas; i++) {  //Confere se o ID inserido pela pessoa é valido;
 			if (ID_conversa == conversa_pntr[i].ID_conversa) {
 				confereID_Conversa = TRUE;
 			}
@@ -230,9 +225,9 @@ void abre_conversa(Conversa* conversa_pntr, Pessoa* pessoas, Grupo* grupos, int 
 			break;
 		}
 
-		for (i = 0; i <= conversa_pntr[ID_conversa - 1].numMensagens; i++) {  //Imprime as mensagens passadas dessa conversa
+		for (i = 0; i < conversa_pntr[ID_conversa - 1].numMensagens; i++) {  //Imprime as mensagens passadas dessa conversa
 			if (conversa_pntr[ID_conversa - 1].texto[i].valido_c == TRUE) {
-				printf("[%d]-[%s] %s\n", conversa_pntr[ID_conversa - 1].texto[i].id_c, pessoas[conversa_pntr[ID_conversa - 1].texto[i].ID_remetente].nome_p, conversa_pntr[ID_conversa - 1].texto[i].mensagem);
+				printf("[%d]-[%s] %s\n", conversa_pntr[ID_conversa - 1].texto[i].id_c, pessoas[(conversa_pntr[ID_conversa - 1].texto[i].ID_remetente) - 1].nome_p, conversa_pntr[ID_conversa - 1].texto[i].mensagem);
 			}
 		}
 
